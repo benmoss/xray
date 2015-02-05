@@ -7,6 +7,7 @@ var ReceptorApi = require('../api/receptor_api');
 var ReceptorUrlModal = require('./receptor_url_modal');
 var Zones = require('./zones');
 var {setCorrectingInterval} = require('correcting-interval');
+var {diff} = require('../helpers/array_helper');
 
 var types = React.PropTypes;
 var update = React.addons.update;
@@ -31,7 +32,7 @@ var Application = React.createClass({
   },
 
   statics: {
-    POLL_INTERVAL: 10000
+    POLL_INTERVAL: 2000
   },
 
   componentDidMount() {
@@ -47,10 +48,17 @@ var Application = React.createClass({
   },
 
   updateReceptor() {
-    return ReceptorApi.fetch().then(
-        receptor => this.setState({receptor: update(this.state.receptor, {$set: receptor})}),
+    return ReceptorApi.fetch().then(function({cells, desiredLrps}) {
+        var {added, removed, changed} = diff(this.state.receptor.cells, cells, 'cell_id', function(current, next) {
+          return current.actual_lrps.map(a => a.since).join('') === next.actual_lrps.map(a => a.since).join('');
+        });
+        console.log({added, removed, changed});
+
+        //this.setState({receptor: update(this.state.receptor, {$merge: {cells, desiredLrps}})});
+
+    }.bind(this),
         reason => console.error('DesiredLrps Promise failed because', reason)
-    );
+    ).catch(() => console.log('boo!', arguments));
   },
 
   pollReceptor() {
