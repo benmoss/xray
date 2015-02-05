@@ -47,7 +47,48 @@ describe('Application', function() {
         });
       });
     });
+
+    describe('#updateReceptor', function() {
+      var oldCells, newCells, oldState;
+      beforeEach(function() {
+        oldCells = [
+          {cell_id: 'immutable', actual_lrps: [{since: 1, instance_guid: '1'}]},
+          {cell_id: 'mutable', actual_lrps: [{since: 1, instance_guid: '2'}, {since: 1, instance_guid: '3'}]},
+          {cell_id: 'removable', actual_lrps: []},
+        ];
+
+        newCells = [
+          {cell_id: 'immutable', actual_lrps: [{since: 1, intance_guid: '1'}]},
+          {cell_id: 'mutable', actual_lrps: [{since: 1, intance_guid: '2'}, {since: 10, instance_guid: '3'}]},
+          {cell_id: 'new', actual_lrps: [{since: 1, instance_guid: '4'}]}
+        ];
+        subject.setState({receptor: {cells: oldCells}});
+        var newReceptorPromise = Deferred();
+        ReceptorApi.fetch.and.returnValue(newReceptorPromise);
+        oldState = subject.state;
+        subject.updateReceptor();
+        newReceptorPromise.resolve({cells: newCells, desiredLrps: []});
+      });
+
+      it('updates the cells', function() {
+        expect(subject.state.receptor.cells.map(({cell_id}) => cell_id)).toEqual(['immutable', 'mutable', 'new']);
+      });
+
+      it('keeps unchanged cells the same in memory', function() {
+        expect(subject.state.receptor.cells[0]).toBe(oldState.receptor.cells[0]);
+      });
+
+      it('updates changed cells', function() {
+        expect(subject.state.receptor.cells[1]).not.toEqual(oldState.receptor.cells[1]);
+      });
+
+      it('does not update unchanged actualLrps', function() {
+        expect(subject.state.receptor.cells[1].actual_lrps[0]).toBe(oldState.receptor.cells[1].actual_lrps[0]);
+        expect(subject.state.receptor.cells[1].actual_lrps[1]).not.toEqual(oldState.receptor.cells[1].actual_lrps[1]);
+      });
+    });
   });
+
 
   describe('when no receptor url is provided in configuration', function() {
     var Modal;

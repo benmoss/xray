@@ -28,7 +28,7 @@ var Application = React.createClass({
   },
 
   getInitialState() {
-    return {receptor: {cells: null, desiredLrps: null}};
+    return {receptor: {cells: [], desiredLrps: null}};
   },
 
   statics: {
@@ -49,16 +49,49 @@ var Application = React.createClass({
 
   updateReceptor() {
     return ReceptorApi.fetch().then(function({cells, desiredLrps}) {
-        var {added, removed, changed} = diff(this.state.receptor.cells, cells, 'cell_id', function(current, next) {
-          return current.actual_lrps.map(a => a.since).join('') === next.actual_lrps.map(a => a.since).join('');
+        var oldCells = this.state.receptor.cells;
+        var updatedCells = oldCells;
+        var {added, removed, changed} = diff(oldCells, cells, 'cell_id', function(current, next) {
+          return current.actual_lrps.map(a => a.since).join('') !== next.actual_lrps.map(a => a.since).join('');
         });
-        console.log({added, removed, changed});
 
-        //this.setState({receptor: update(this.state.receptor, {$merge: {cells, desiredLrps}})});
+        removed.forEach(function(removedCell) {
+          var cellToRemove = updatedCells.find(({cell_id}) => cell_id === removedCell.cell_id);
+          updatedCells = update(updatedCells, {$splice: [[updatedCells.indexOf(cellToRemove),1]]});
+        });
+
+        changed.forEach(function(changedCell) {
+          var cellToUpdate = updatedCells.find(({cell_id}) => cell_id === changedCell.cell_id);
+          var oldLrps = cellToUpdate.actual_lrps;
+          var updatedLrps = oldLrps;
+          var cellIndex = updatedCells.indexOf(cellToUpdate);
+
+          var {added: addedLrps, removed: removedLrps, changed: changedLrps} = diff(
+            cellToUpdate.actual_lrps, changedCell.actual_lrps, 'instance_guid', function(current, next) {
+              return current.since !== next.since;
+            }
+          );
+          changedLrps.forEach(function(changedLrp) {
+            var lrpToUpdate = updatedLrps.find(({instance_guid}) => instance_guid === changedLrp.instance_guid
+            )
+            ;
+            var lrpIndex = updatedLrps.indexOf(lrpToUpdate);
+
+            lrpToUpdate = update(lrpToUpdate, {$set: changedLrp});
+            updatedLrps = update(updatedLrps, {$merge: {[lrpIndex]: lrpToUpdate}});
+          });
+
+          cellToUpdate = update(cellToUpdate, {$merge: {actual_lrps: updatedLrps}});
+          updatedCells = update(updatedCells, {$merge: {[cellIndex]: cellToUpdate}});
+        });
+
+        updatedCells = update(updatedCells, {$push: added});
+
+        this.setState({receptor: update(this.state.receptor, {$set: {cells: updatedCells, desiredLrps}})});
 
     }.bind(this),
         reason => console.error('DesiredLrps Promise failed because', reason)
-    ).catch(() => console.log('boo!', arguments));
+    ).catch(() => {debugger; console.log('boo!', arguments)});
   },
 
   pollReceptor() {
