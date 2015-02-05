@@ -32,7 +32,7 @@ var Application = React.createClass({
   },
 
   statics: {
-    POLL_INTERVAL: 2000
+    POLL_INTERVAL: 10000
   },
 
   componentDidMount() {
@@ -71,15 +71,21 @@ var Application = React.createClass({
               return current.since !== next.since;
             }
           );
+          
+          removedLrps.forEach(function(removedLrp) {
+            var lrpToRemove = updatedLrps.find(({instance_guid}) => instance_guid === removedLrp.instance_guid);
+            updatedLrps = update(updatedLrps, {$splice: [[updatedLrps.indexOf(lrpToRemove),1]]});
+          });
+          
           changedLrps.forEach(function(changedLrp) {
-            var lrpToUpdate = updatedLrps.find(({instance_guid}) => instance_guid === changedLrp.instance_guid
-            )
-            ;
+            var lrpToUpdate = updatedLrps.find(({instance_guid}) => instance_guid === changedLrp.instance_guid);
             var lrpIndex = updatedLrps.indexOf(lrpToUpdate);
 
             lrpToUpdate = update(lrpToUpdate, {$set: changedLrp});
             updatedLrps = update(updatedLrps, {$merge: {[lrpIndex]: lrpToUpdate}});
           });
+
+          updatedLrps = update(updatedLrps, {$push: addedLrps});
 
           cellToUpdate = update(cellToUpdate, {$merge: {actual_lrps: updatedLrps}});
           updatedCells = update(updatedCells, {$merge: {[cellIndex]: cellToUpdate}});
