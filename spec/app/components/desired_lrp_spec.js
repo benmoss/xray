@@ -133,13 +133,17 @@ describe('DesiredLrp', function() {
     });
   });
 
-  describe('when user clicks on the component', function() {
+  describe('when user clicks it', function() {
     beforeEach(function() {
       $('.desired-lrp').simulate('click');
     });
 
     it('selects the lrp', function() {
       expect(selectedDesiredLrpCallbackSpy).toHaveBeenCalledWith(jasmine.objectContaining({selectedDesiredLrp: desiredLrp}));
+    });
+
+    it('opens the sidebar', function() {
+      expect(sidebarCollapsedCallbackSpy).toHaveBeenCalledWith(false);
     });
   });
 });

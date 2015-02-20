@@ -58,7 +58,7 @@ var Application = React.createClass({
 
   render() {
     var {receptorUrl} = this.state;
-    var $receptor = new Cursor(this.state.receptor, receptor => this.setState({receptor}));
+    var $receptor = new Cursor(this.state.receptor, receptor => console.log(receptor) || this.setState({receptor}));
     return (
       <div className="xray">
         <Page {...{$receptor, receptorUrl}} ref="page">

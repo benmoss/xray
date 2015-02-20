@@ -25,14 +25,14 @@ var DesiredLrpList = React.createClass({
     if(!desiredLrps.length) {
       return <div className="mam">No filtered processes found.</div>;
     }
-    var sidebarCollapsed = $receptor.get('sidebarCollapsed');
+    var $sidebarCollapsed = $receptor.refine('sidebarCollapsed');
     return desiredLrps.map(function(desiredLrp, i) {
       var key = desiredLrp.process_guid;
-      var odd = sidebarCollapsed ? 0 : i % 2;
+      var odd = $sidebarCollapsed.get() ? 0 : i % 2;
       var className = cx({'clickable': true, 'bg-dark-1': odd, 'bg-dark-2': !odd});
       var filtered = actualLrps.filter(({process_guid}) => process_guid === desiredLrp.process_guid);
       var isSelected = !!(desiredLrp && $hoverDesiredLrp.get() === desiredLrp);
-      var props = {className, desiredLrp, actualLrps: filtered, key, $hoverDesiredLrp, $selectedDesiredLrp, isSelected};
+      var props = {className, desiredLrp, actualLrps: filtered, key, $hoverDesiredLrp, $selectedDesiredLrp, $sidebarCollapsed, isSelected};
       return <DesiredLrp {...props}/>;
     }, this);
   },
