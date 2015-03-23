@@ -45,15 +45,34 @@ describe('BaseApi', function() {
     });
   });
 
-  describe('#put', function() {
-    it('sends a put to the correct url with the right data', function() {
-      var data = {name: 'Tom'};
-      subject.put('foo', data);
+  describe('#update', function() {
+    var data;
+    beforeEach(function() {
+      data = {name: 'Tom'};
+      subject.update('foo', data);
+    });
+    it('sends a put to the correct url', function() {
       var request = jasmine.Ajax.requests.mostRecent();
       expect(request).toBeDefined();
       expect(request.method).toEqual('PUT');
       expect(request.url).toEqual(`${subject.baseUrl}/v1/foo`);
+    });
+
+    it('sends the correct data', function() {
+      var request = jasmine.Ajax.requests.mostRecent();
       expect(JSON.parse(request.params)).toEqual(data);
+    });
+  });
+
+  describe('#destroy', function() {
+    beforeEach(function() {
+      subject.destroy('foo');
+    });
+    it('sends a delete to the correct url', function() {
+      var request = jasmine.Ajax.requests.mostRecent();
+      expect(request).toBeDefined();
+      expect(request.method).toEqual('DELETE');
+      expect(request.url).toEqual(`${subject.baseUrl}/v1/foo`);
     });
   });
 });

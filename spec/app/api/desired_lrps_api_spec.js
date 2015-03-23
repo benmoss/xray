@@ -56,4 +56,18 @@ describe('DesiredLrpsApi', function() {
       expect(JSON.parse(request.params)).toEqual({instances: 8});
     });
   });
+
+  describe('#destroy', function() {
+    var desiredLrp;
+    beforeEach(function() {
+      desiredLrp = Factory.build('desiredLrp', {process_guid: 'abc'});
+      subject.destroy(desiredLrp);
+    });
+
+    it('deletes to desiredLrp', function() {
+      var request = jasmine.Ajax.requests.filter(`${RECEPTOR_URL}/v1/desired_lrps/abc`)[0];
+      expect(request).toBeDefined();
+      expect(request.method).toBe('DELETE');
+    });
+  });
 });

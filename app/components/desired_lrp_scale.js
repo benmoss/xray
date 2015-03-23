@@ -30,11 +30,16 @@ var DesiredLrpScale = React.createClass({
   render() {
     return (
       <div className='desired-lrp-scale phl txt-c'>
-        <form className='form-inline' onSubmit={this.submit}>
-          <label className='type-neutral-11'>Desired Instances
+        <form className="form-inline" onSubmit={this.submit}>
+          <div className="form-group">
+          <label className='type-neutral-11'>Instances
             <input className='form-control mhm' type="number" min="0" step="1" max="999999" value={this.state.instances} onChange={this.onChange} />
           </label>
           <pui.DefaultButton type="submit">Scale</pui.DefaultButton>
+          </div>
+          <div className="form-group mlm">
+            <pui.DangerButton>Destroy</pui.DangerButton>
+          </div>
         </form>
       </div>
     );

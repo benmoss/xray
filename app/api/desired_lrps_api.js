@@ -8,7 +8,11 @@ var DesiredLrpsApi = {
   },
 
   scale(desiredLrp, instances) {
-    return BaseApi.put(`desired_lrps/${desiredLrp.process_guid}`, {instances});
+    return BaseApi.update(`desired_lrps/${desiredLrp.process_guid}`, {instances});
+  },
+
+  destroy(desiredLrp) {
+    return BaseApi.destroy(`desired_lrps/${desiredLrp.process_guid}`);
   }
 };
 
