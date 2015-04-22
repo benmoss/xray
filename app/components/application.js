@@ -48,6 +48,27 @@ var Application = React.createClass({
     };
   },
 
+  foo() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'http://localhost:4000/foo/v1/cells', true);
+    xhr.withCredentials = 'true';
+    xhr.setRequestHeader ("Accept", "application/json");
+    xhr.onload = function() {
+      console.log(xhr.responseText);
+    };
+    xhr.send();
+  },
+
+  componentDidMount() {
+    var request = require('superagent');
+
+    request.post('http://localhost:4000/authenticate')
+      .withCredentials()
+      .end(function(error, res) {
+        this.foo();
+      }.bind(this));
+  },
+
   componentDidUpdate() {
     var {receptor, selection, sidebar} = this.state;
     Object.assign(xray, {receptor, selection, sidebar});

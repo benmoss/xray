@@ -122,8 +122,8 @@ var ReceptorStreamMixin = {
   },
 
   createSSE(receptorUrl) {
-    var sse = new StreamSource(`${receptorUrl}/v1/events`, {withCredentials: true});
-    privates.set(this, {sse});
+    //var sse = new StreamSource(`${receptorUrl}/v1/events`, {withCredentials: true});
+    //privates.set(this, {sse});
   },
 
   destroySSE() {

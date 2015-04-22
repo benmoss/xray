@@ -1,4 +1,4 @@
-const CELL_POLL_INTERVAL = 10000;
+const CELL_POLL_INTERVAL = 1000000;
 const RECEPTOR_POLL_INTERVAL = 30000;
 
 var ReceptorApi = require('../api/receptor_api');

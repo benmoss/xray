@@ -14,7 +14,7 @@ var classnames = require('classnames');
 var types = React.PropTypes;
 
 var Page = React.createClass({
-  mixins: [PureRenderMixin, ReceptorMixin, ReceptorStreamMixin],
+  //mixins: [PureRenderMixin, ReceptorMixin, ReceptorStreamMixin],
 
   propTypes: {
     receptorUrl: types.string.isRequired,
@@ -31,9 +31,9 @@ var Page = React.createClass({
   componentWillReceiveProps(nextProps) {
     if (nextProps.receptorUrl && !BaseApi.baseUrl) {
       BaseApi.baseUrl = nextProps.receptorUrl;
-      this.updateReceptor();
-      this.pollReceptor();
-      this.streamSSE(nextProps.receptorUrl);
+      //this.updateReceptor();
+      //this.pollReceptor();
+      //this.streamSSE(nextProps.receptorUrl);
     }
   },
 

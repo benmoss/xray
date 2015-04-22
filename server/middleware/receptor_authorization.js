@@ -17,7 +17,7 @@ module.exports = function(req, res, next) {
   if (receptorUrl) {
     res.cookie('receptor_url', receptorUrl);
     var receptorAuthorization = getReceptorCredentials(receptorUrl);
-    if (receptorAuthorization) res.cookie('receptor_authorization', receptorAuthorization);
+    if (receptorAuthorization) res.cookie('receptor_authorization', receptorAuthorization, {domain: 'localhost'});
   }
   next();
 };
